@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArtEcho 测试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: 0;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            color: #fff;
+            margin-bottom: 20px;
+        }
+        .status {
+            background: rgba(76, 175, 80, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .links {
+            margin: 20px 0;
+        }
+        a {
+            color: #fff;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin: 5px;
+            display: inline-block;
+        }
+        a:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 ArtEcho Web服务器测试</h1>
+        <div class="status">
+            ✅ 服务器正在运行
+        </div>
+        <p>如果您能看到这个页面，说明Web服务器工作正常！</p>
+        
+        <div class="links">
+            <a href="http://localhost:3001">访问主应用</a>
+            <a href="http://127.0.0.1:3001">IP地址访问</a>
+        </div>
+        
+        <h3>测试信息：</h3>
+        <p>当前时间：<span id="time"></span></p>
+        <p>用户代理：<span id="ua"></span></p>
+        
+        <script>
+            document.getElementById('time').textContent = new Date().toLocaleString();
+            document.getElementById('ua').textContent = navigator.userAgent.substring(0, 50) + '...';
+            
+            // 测试JavaScript是否工作
+            setTimeout(() => {
+                document.querySelector('.status').innerHTML = '✅ 服务器和JavaScript都正常工作';
+            }, 2000);
+        </script>
+    </div>
+</body>
+</html>

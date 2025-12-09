@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArtEcho - AI Powered Art Appreciation</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            min-height: 100vh; 
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: rgba(255,255,255,0.95); 
+            border-radius: 20px; 
+            padding: 40px; 
+        }
+        h1 { color: #2c3e50; text-align: center; }
+        .upload-area { 
+            border: 3px dashed #3498db; 
+            padding: 40px; 
+            text-align: center; 
+            margin: 20px 0; 
+            border-radius: 10px; 
+        }
+        .btn { 
+            background: #3498db; 
+            color: white; 
+            padding: 15px 30px; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+        }
+        .btn:hover { background: #2980b9; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 ArtEcho</h1>
+        <p style="text-align:center; color:#7f8c8d;">AI-Powered Interactive Art Appreciation Platform</p>
+        
+        <div class="upload-area">
+            <h2>上传名画进行分析</h2>
+            <input type="file" id="imageUpload" accept="image/*" style="display:none;">
+            <label for="imageUpload" class="btn">📷 选择图片</label>
+            <div id="preview" style="margin-top:20px;"></div>
+        </div>
+        
+        <div>
+            <h3>示例作品</h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                <div style="background:white;padding:15px;border-radius:10px;">
+                    <img src="https://picsum.photos/400/300?random=1" style="width:100%;border-radius:8px;">
+                    <h4>蒙娜丽莎</h4>
+                    <p>达芬奇作品</p>
+                </div>
+                <div style="background:white;padding:15px;border-radius:10px;">
+                    <img src="https://picsum.photos/400/300?random=2" style="width:100%;border-radius:8px;">
+                    <h4>星夜</h4>
+                    <p>梵高作品</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('imageUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('preview').innerHTML = 
+                        '<img src="' + e.target.result + '" style="max-width:100%;border-radius:10px;"><p>AI分析中...</p>';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>
