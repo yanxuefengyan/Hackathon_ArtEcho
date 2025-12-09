@@ -1,4 +1,4 @@
-```markdown
+
 # ArtEcho: AI-Powered Interactive Art Appreciation
 
 > **让名画活起来，让文化传下去**  
@@ -137,6 +137,3 @@ ArtEcho/
 
 > 艺术不止于观看，更在于对话。  
 > ArtEcho，让每一幅画都拥有自己的声音。
-```
-
-如果有新的想法，欢迎随时和我讨论！
