@@ -1287,37 +1287,60 @@
             status.className = 'camera-status warning';
             status.textContent = '📱 正在准备移动端上传...';
             
-            setTimeout(() => {
-                status.className = 'camera-status success';
-                status.textContent = '✅ 移动端上传功能已准备';
-                
-                const uploadUrl = window.location.href;
-                const modal = document.createElement('div');
-                modal.style.cssText = `
-                    position: fixed;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    background: white;
-                    padding: 30px;
-                    border-radius: 15px;
-                    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-                    z-index: 1000;
-                    text-align: center;
-                    max-width: 400px;
-                `;
-                
-                modal.innerHTML = `
-                    <h3 style="margin-bottom: 20px;">📱 移动端上传</h3>
-                    <p style="margin-bottom: 15px;">请使用手机浏览器访问：</p>
-                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-family: monospace;">
-                        ${uploadUrl}
-                    </div>
-                    <button class="btn btn-primary" onclick="this.parentElement.remove()">关闭</button>
-                `;
-                
-                document.body.appendChild(modal);
-            }, 1000);
+            // 动态加载QRCode.js库
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js';
+            script.onload = function() {
+                setTimeout(() => {
+                    status.className = 'camera-status success';
+                    status.textContent = '✅ 移动端上传功能已准备';
+                    
+                    const uploadUrl = window.location.href;
+                    const modal = document.createElement('div');
+                    modal.style.cssText = `
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background: white;
+                        padding: 30px;
+                        border-radius: 15px;
+                        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                        z-index: 1000;
+                        text-align: center;
+                        max-width: 450px;
+                    `;
+                    
+                    modal.innerHTML = `
+                        <h3 style="margin-bottom: 20px;">📱 移动端上传</h3>
+                        <p style="margin-bottom: 15px;">扫码或使用手机浏览器访问：</p>
+                        <div style="background: white; padding: 20px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #e9ecef; display: inline-block;">
+                            <div id="qrcode" style="width: 200px; height: 200px; margin: 0 auto;"></div>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 20px; font-family: monospace; font-size: 12px; word-break: break-all;">
+                            ${uploadUrl}
+                        </div>
+                        <button class="btn btn-primary" onclick="this.parentElement.remove()">关闭</button>
+                    `;
+                    
+                    document.body.appendChild(modal);
+                    
+                    // 生成二维码
+                    new QRCode(document.getElementById("qrcode"), {
+                        text: uploadUrl,
+                        width: 200,
+                        height: 200,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                }, 1000);
+            };
+            script.onerror = function() {
+                status.className = 'camera-status error';
+                status.textContent = '❌ 无法加载二维码生成器，请刷新页面重试';
+            };
+            document.head.appendChild(script);
         }
         
         // 拍照功能
