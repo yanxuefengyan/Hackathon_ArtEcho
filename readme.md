@@ -21,6 +21,8 @@ https://github.com/yanxuefengyan/Hackathon_ArtEcho.git
 云服务器部署
 http://124.222.109.40/
 
+功能演示视频：https://live.csdn.net/v/505022
+
 ## ✨ 核心功能
 
 ### 📸 多方式图片获取
