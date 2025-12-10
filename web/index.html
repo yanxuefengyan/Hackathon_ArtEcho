@@ -1,0 +1,2042 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArtEcho - AI Powered Art Appreciation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+        
+        .main-section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .section-title h2 {
+            color: #2c3e50;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .camera-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .camera-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .camera-option {
+            background: white;
+            border-radius: 15px;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+        }
+        
+        .camera-option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-color: #28a745;
+        }
+        
+        .camera-option.active {
+            border-color: #28a745;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        }
+        
+        .camera-option h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .camera-option p {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #218838;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        
+        .camera-status {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        .camera-status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .camera-status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .camera-status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .video-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            display: none;
+        }
+        
+        .video-container.active {
+            display: block;
+        }
+        
+        .video-container video {
+            width: 100%;
+            height: auto;
+            border-radius: 15px;
+            background: #000;
+        }
+        
+        .video-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 10px;
+        }
+        
+        .preview-section {
+            margin-top: 30px;
+            min-height: 200px;
+        }
+        
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        
+        .preview-item {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .preview-item:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.18);
+        }
+        
+        .preview-item img {
+            width: 100%;
+            height: auto;
+            max-height: 400px;
+            object-fit: contain;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            display: block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .preview-item h4 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .preview-item p {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .preview-item .file-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .preview-item .file-info .source-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .preview-item .file-info .source-webcam {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .preview-item .file-info .source-upload {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .preview-item .file-info .source-mobile {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .nav-tab {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            background: #f8f9fa;
+            color: #6c757d;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+        
+        .nav-tab:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+        
+        .nav-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .gallery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+        }
+        
+        .gallery-stats {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .gallery-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 25px;
+            padding: 8px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            min-width: 300px;
+        }
+        
+        .search-input {
+            border: none;
+            outline: none;
+            flex: 1;
+            padding: 8px;
+            font-size: 0.9rem;
+            background: transparent;
+        }
+        
+        .search-icon {
+            color: #6c757d;
+            margin-right: 10px;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 20px;
+            background: white;
+            color: #6c757d;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .filter-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .view-options {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .view-btn {
+            padding: 8px 12px;
+            border: 1px solid #e9ecef;
+            background: white;
+            color: #6c757d;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .view-btn:hover {
+            color: #667eea;
+            border-color: #667eea;
+        }
+        
+        .view-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .gallery-grid.list-view {
+            grid-template-columns: 1fr;
+        }
+        
+        .gallery-item {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        .gallery-item.selected {
+            border: 3px solid #667eea;
+            transform: translateY(-3px);
+        }
+        
+        .gallery-checkbox {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 20px;
+            height: 20px;
+            background: rgba(255,255,255,0.9);
+            border: 2px solid #667eea;
+            border-radius: 4px;
+            cursor: pointer;
+            z-index: 10;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .gallery-item:hover .gallery-checkbox {
+            display: flex;
+        }
+        
+        .gallery-checkbox.checked {
+            background: #667eea;
+        }
+        
+        .gallery-checkbox.checked::after {
+            content: '✓';
+            color: white;
+            font-size: 12px;
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+        
+        .gallery-grid.list-view .gallery-item {
+            display: flex;
+            height: 120px;
+        }
+        
+        .gallery-grid.list-view .gallery-item img {
+            width: 120px;
+            height: 120px;
+            flex-shrink: 0;
+        }
+        
+        .gallery-grid.list-view .gallery-item-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .gallery-item-info {
+            padding: 15px;
+        }
+        
+        .gallery-item-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #2c3e50;
+            font-size: 1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .gallery-item-desc {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 10px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .gallery-item-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .gallery-item-date {
+            font-size: 0.75rem;
+            color: #999;
+        }
+        
+        .gallery-item-source {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: #f8f9fa;
+            color: #6c757d;
+        }
+        
+        .gallery-item-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .gallery-item-tags {
+            display: flex;
+            gap: 5px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .gallery-tag {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            background: #e9ecef;
+            color: #6c757d;
+            border-radius: 8px;
+        }
+        
+        .batch-actions {
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            color: white;
+        }
+        
+        .batch-actions.active {
+            display: flex;
+        }
+        
+        .batch-info {
+            font-weight: 600;
+        }
+        
+        .batch-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .batch-btn {
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+        
+        .batch-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .batch-btn.danger {
+            background: rgba(220,53,69,0.8);
+            border-color: rgba(220,53,69,0.9);
+        }
+        
+        .batch-btn.danger:hover {
+            background: rgba(220,53,69,1);
+        }
+        
+        .upload-zone {
+            border: 2px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            background: rgba(102,126,234,0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+        }
+        
+        .upload-zone:hover {
+            background: rgba(102,126,234,0.1);
+            border-color: #764ba2;
+        }
+        
+        .upload-zone.dragover {
+            background: rgba(102,126,234,0.2);
+            border-color: #764ba2;
+            transform: scale(1.02);
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+        
+        .upload-text {
+            font-size: 1.1rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .upload-subtext {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            display: none;
+            align-items: center;
+            gap: 10px;
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .toast.show {
+            display: flex;
+        }
+        
+        .toast.success {
+            border-left: 4px solid #28a745;
+        }
+        
+        .toast.error {
+            border-left: 4px solid #dc3545;
+        }
+        
+        .toast.warning {
+            border-left: 4px solid #ffc107;
+        }
+        
+        .toast-icon {
+            font-size: 1.2rem;
+        }
+        
+        .toast.success .toast-icon {
+            color: #28a745;
+        }
+        
+        .toast.error .toast-icon {
+            color: #dc3545;
+        }
+        
+        .toast.warning .toast-icon {
+            color: #ffc107;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-edit {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-edit:hover {
+            background: #e0a800;
+        }
+        
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-delete:hover {
+            background: #c82333;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6c757d;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .empty-gallery {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+        
+        .empty-gallery-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .empty-gallery-text {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .camera-controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .preview-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+            
+            .gallery-header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            .preview-item img {
+                max-height: 300px;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-tab {
+                width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🎨 画展助手 ArtEcho</h1>
+            <p>AI-Powered Interactive Art Appreciation Platform</p>
+            <nav class="nav-tabs">
+                <button class="nav-tab active" onclick="switchTab('upload')">📸 图片处理</button>
+                <button class="nav-tab" onclick="switchTab('gallery')">🖼️ 我的画廊</button>
+            </nav>
+        </header>
+
+        <div class="main-section">
+            <div class="section-title">
+                <h2>🎨 智能图片处理</h2>
+                <p>多种方式获取图片，AI实时分析名画</p>
+            </div>
+            
+            <div class="camera-section">
+                <div class="camera-controls">
+                    <div class="camera-option" onclick="startWebCamera()">
+                        <h3>📹 电脑摄像头</h3>
+                        <p>打开电脑摄像头直接拍摄</p>
+                        <button class="btn btn-primary">启动摄像头</button>
+                    </div>
+                    
+                    <div class="camera-option" onclick="startFileUpload()">
+                        <h3>📁 本地图片上传</h3>
+                        <p>从本地选择图片上传分析</p>
+                        <button class="btn btn-primary">选择图片</button>
+                    </div>
+                    
+                    <div class="camera-option" onclick="startMobileCamera()">
+                        <h3>📱 移动端拍照</h3>
+                        <p>手机扫码上传或拍照上传</p>
+                        <button class="btn btn-warning">扫码上传</button>
+                    </div>
+                </div>
+                
+                <div id="cameraStatus" class="camera-status" style="display: none;">
+                    准备启动图片处理...
+                </div>
+                
+                <div id="videoContainer" class="video-container">
+                    <video id="videoElement" autoplay playsinline muted></video>
+                    <div class="video-controls">
+                        <button class="btn btn-primary" onclick="capturePhoto()">📸 拍照</button>
+                        <button class="btn btn-secondary" onclick="switchCamera()">🔄 切换摄像头</button>
+                        <button class="btn btn-danger" onclick="stopCamera()">⏹ 停止</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="previewSection" class="preview-section hidden">
+                <h3 style="text-align: center; margin-bottom: 20px;">📸 处理的图片</h3>
+                <div id="previewGrid" class="preview-grid"></div>
+            </div>
+        </div>
+
+        <!-- 画廊标签页 -->
+        <div id="galleryTab" class="tab-content">
+            <div class="gallery-header">
+                <div class="gallery-stats">
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalPhotos">0</div>
+                        <div class="stat-label">总照片数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="todayPhotos">0</div>
+                        <div class="stat-label">今日新增</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="storageSize">0 MB</div>
+                        <div class="stat-label">存储大小</div>
+                    </div>
+                </div>
+                <div>
+                    <button class="btn btn-danger" onclick="clearGallery()">🗑️ 清空画廊</button>
+                    <button class="btn btn-primary" onclick="exportGallery()">📤 导出画廊</button>
+                </div>
+            </div>
+
+            <!-- 拖拽上传区域 -->
+            <div class="upload-zone" id="uploadZone" onclick="document.getElementById('galleryFileInput').click()">
+                <div class="upload-icon">📤</div>
+                <div class="upload-text">拖拽图片到这里上传</div>
+                <div class="upload-subtext">或点击选择文件 (支持多选)</div>
+            </div>
+            <input type="file" id="galleryFileInput" style="display: none;" accept="image/*" multiple>
+
+            <!-- 搜索和筛选控件 -->
+            <div class="gallery-controls">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" id="searchInput" placeholder="搜索图片名称或描述...">
+                </div>
+                
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="filterPhotos('all')">全部</button>
+                    <button class="filter-btn" onclick="filterPhotos('webcam')">📹 摄像头</button>
+                    <button class="filter-btn" onclick="filterPhotos('upload')">📁 本地上传</button>
+                    <button class="filter-btn" onclick="filterPhotos('mobile')">📱 移动端</button>
+                </div>
+                
+                <div class="view-options">
+                    <button class="view-btn active" onclick="changeView('grid')" title="网格视图">⊞</button>
+                    <button class="view-btn" onclick="changeView('list')" title="列表视图">☰</button>
+                </div>
+            </div>
+
+            <!-- 批量操作栏 -->
+            <div class="batch-actions" id="batchActions">
+                <div class="batch-info">已选择 <span id="selectedCount">0</span> 张图片</div>
+                <div class="batch-buttons">
+                    <button class="batch-btn" onclick="selectAll()">全选</button>
+                    <button class="batch-btn" onclick="deselectAll()">取消选择</button>
+                    <button class="batch-btn" onclick="batchEdit()">批量编辑</button>
+                    <button class="batch-btn danger" onclick="batchDelete()">批量删除</button>
+                </div>
+            </div>
+            
+            <div id="galleryGrid" class="gallery-grid"></div>
+            
+            <div id="emptyGallery" class="empty-gallery" style="display: none;">
+                <div class="empty-gallery-icon">🖼️</div>
+                <div class="empty-gallery-text">画廊还是空的</div>
+                <p>开始上传或拍照来填充你的艺术画廊吧！</p>
+                <button class="btn btn-primary" onclick="switchTab('upload')">📸 开始添加图片</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑模态框 -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">编辑图片信息</h3>
+                <button class="modal-close" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form id="editForm">
+                <div class="form-group">
+                    <label class="form-label">图片名称</label>
+                    <input type="text" class="form-input" id="editTitle" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">图片描述</label>
+                    <textarea class="form-input form-textarea" id="editDescription"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 图片预览模态框 -->
+    <div id="previewModal" class="modal">
+        <div class="modal-content" style="max-width: 90%; max-height: 90%;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="previewTitle">图片预览</h3>
+                <button class="modal-close" onclick="closePreviewModal()">&times;</button>
+            </div>
+            <div style="text-align: center;">
+                <img id="previewImage" style="max-width: 100%; max-height: 70vh; object-fit: contain; border-radius: 10px;">
+                <p id="previewDescription" style="margin-top: 15px; color: #6c757d;"></p>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script>
+        let stream = null;
+        let currentCamera = 'user';
+        let photoCount = 0;
+        let photos = [];
+        
+        // 本地图片上传功能
+        function startFileUpload() {
+            const status = document.getElementById('cameraStatus');
+            status.style.display = 'block';
+            status.className = 'camera-status warning';
+            status.textContent = '📁 正在选择图片...';
+            
+            // 创建文件输入元素
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.multiple = true;
+            
+            input.onchange = function(event) {
+                const files = event.target.files;
+                if (files.length > 0) {
+                    status.className = 'camera-status success';
+                    status.textContent = `✅ 已选择 ${files.length} 个文件`;
+                    
+                    // 处理每个文件
+                    Array.from(files).forEach((file, index) => {
+                        processFileForUpload(file, 'upload', index + 1);
+                    });
+                }
+            };
+            
+            input.click();
+        }
+        
+        // 处理文件
+        function processFile(file, source, index) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const photoData = {
+                    id: Date.now() + '_' + index,
+                    source: source,
+                    timestamp: new Date().toLocaleString(),
+                    fileName: file.name,
+                    fileSize: (file.size / 1024).toFixed(2) + ' KB',
+                    dataUrl: e.target.result
+                };
+                
+                photos.push(photoData);
+                displayPhotos();
+                
+                // 显示处理状态
+                const status = document.getElementById('cameraStatus');
+                status.className = 'camera-status success';
+                status.textContent = `✅ 文件 "${file.name}" 处理完成，正在AI分析...`;
+                
+                // 模拟AI分析
+                setTimeout(() => {
+                    analyzePhoto(photoData.id);
+                }, 2000);
+            };
+            
+            reader.onerror = function(e) {
+                const status = document.getElementById('cameraStatus');
+                status.className = 'camera-status error';
+                status.textContent = `❌ 文件 "${file.name}" 读取失败`;
+            };
+            
+            reader.readAsDataURL(file);
+        }
+        
+        // 处理上传文件并自动保存到画廊
+        function processFileForUpload(file, source, index) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                // 直接保存到画廊
+                const photoData = {
+                    id: 'gallery_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                    title: file.name.replace(/\.[^/.]+$/, ""), // 移除文件扩展名
+                    description: '通过本地上传的图片',
+                    dataUrl: e.target.result,
+                    date: new Date().toLocaleString(),
+                    source: 'upload',
+                    fileSize: (file.size / 1024).toFixed(2) + ' KB'
+                };
+                
+                // 保存到画廊
+                galleryPhotos.push(photoData);
+                saveGallery();
+                
+                // 同时添加到预览区域
+                const previewData = {
+                    id: Date.now() + '_' + index,
+                    source: source,
+                    timestamp: new Date().toLocaleString(),
+                    fileName: file.name,
+                    fileSize: (file.size / 1024).toFixed(2) + ' KB',
+                    dataUrl: e.target.result
+                };
+                
+                photos.push(previewData);
+                displayPhotos();
+                
+                // 显示自动保存提示
+                showToast('success', `📁 上传成功！已自动保存到画廊："${photoData.title}"`);
+                
+                // 如果当前在画廊标签页，刷新显示
+                if (document.getElementById('galleryTab').classList.contains('active')) {
+                    displayGallery();
+                    updateGalleryStats();
+                }
+            };
+            
+            reader.onerror = function(e) {
+                showToast('error', `❌ 文件 "${file.name}" 读取失败`);
+            };
+            
+            reader.readAsDataURL(file);
+        }
+        
+        // 启动电脑摄像头
+        async function startWebCamera() {
+            const status = document.getElementById('cameraStatus');
+            const videoContainer = document.getElementById('videoContainer');
+            
+            try {
+                status.style.display = 'block';
+                status.className = 'camera-status warning';
+                status.textContent = '📹 正在启动摄像头...';
+                
+                // 获取摄像头列表
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const videoDevices = devices.filter(device => device.kind === 'videoinput');
+                
+                if (videoDevices.length === 0) {
+                    throw new Error('未检测到摄像头设备');
+                }
+                
+                // 获取摄像头流
+                const constraints = {
+                    video: {
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        facingMode: currentCamera
+                    },
+                    audio: false
+                };
+                
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                
+                const videoElement = document.getElementById('videoElement');
+                videoElement.srcObject = stream;
+                await videoElement.play();
+                
+                videoContainer.classList.add('active');
+                status.className = 'camera-status success';
+                status.textContent = '✅ 摄像头已启动，可以开始拍摄';
+                
+            } catch (error) {
+                console.error('摄像头启动失败:', error);
+                status.className = 'camera-status error';
+                
+                if (error.name === 'NotAllowedError') {
+                    status.textContent = '❌ 摄像头权限被拒绝。请允许网站访问摄像头。';
+                } else if (error.name === 'NotFoundError') {
+                    status.textContent = '❌ 未检测到摄像头设备。请确保摄像头已连接。';
+                } else if (error.name === 'NotReadableError') {
+                    status.textContent = '❌ 摄像头被其他应用占用。请关闭其他可能使用摄像头的程序。';
+                } else {
+                    status.textContent = '❌ 摄像头启动失败: ' + error.message;
+                }
+                
+                setTimeout(() => {
+                    showFileUploadSuggestion();
+                }, 3000);
+            }
+        }
+        
+        // 显示文件上传建议
+        function showFileUploadSuggestion() {
+            const status = document.getElementById('cameraStatus');
+            status.className = 'camera-status warning';
+            status.innerHTML = `
+                💡 摄像头启动失败，建议：<br>
+                • 使用"本地图片上传"功能<br>
+                • 检查摄像头权限设置<br>
+                • 确保摄像头未被其他程序占用
+            `;
+        }
+        
+        // 移动端拍照
+        function startMobileCamera() {
+            const status = document.getElementById('cameraStatus');
+            status.style.display = 'block';
+            status.className = 'camera-status warning';
+            status.textContent = '📱 正在准备移动端上传...';
+            
+            setTimeout(() => {
+                status.className = 'camera-status success';
+                status.textContent = '✅ 移动端上传功能已准备';
+                
+                const uploadUrl = window.location.href;
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: white;
+                    padding: 30px;
+                    border-radius: 15px;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                    z-index: 1000;
+                    text-align: center;
+                    max-width: 400px;
+                `;
+                
+                modal.innerHTML = `
+                    <h3 style="margin-bottom: 20px;">📱 移动端上传</h3>
+                    <p style="margin-bottom: 15px;">请使用手机浏览器访问：</p>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-family: monospace;">
+                        ${uploadUrl}
+                    </div>
+                    <button class="btn btn-primary" onclick="this.parentElement.remove()">关闭</button>
+                `;
+                
+                document.body.appendChild(modal);
+            }, 1000);
+        }
+        
+        // 拍照功能
+        function capturePhoto() {
+            const videoElement = document.getElementById('videoElement');
+            const canvas = document.createElement('canvas');
+            canvas.width = videoElement.videoWidth;
+            canvas.height = videoElement.videoHeight;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(videoElement, 0, 0);
+            
+            canvas.toBlob(function(blob) {
+                const file = new File([blob], `webcam_photo_${photoCount + 1}.jpg`, { type: 'image/jpeg' });
+                
+                // 直接保存到画廊，不询问用户
+                const photoData = {
+                    id: 'gallery_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                    title: `摄像头照片_${new Date().toLocaleString()}`,
+                    description: '通过摄像头拍摄的照片',
+                    dataUrl: canvas.toDataURL('image/jpeg', 0.95),
+                    date: new Date().toLocaleString(),
+                    source: 'webcam',
+                    fileSize: (blob.size / 1024).toFixed(2) + ' KB'
+                };
+                
+                // 保存到画廊
+                galleryPhotos.push(photoData);
+                saveGallery();
+                
+                // 同时添加到预览区域
+                processFile(file, 'webcam', photoCount + 1);
+                photoCount++;
+                
+                // 显示自动保存提示
+                showToast('success', `📸 拍照成功！已自动保存到画廊："${photoData.title}"`);
+                
+                // 如果当前在画廊标签页，刷新显示
+                if (document.getElementById('galleryTab').classList.contains('active')) {
+                    displayGallery();
+                    updateGalleryStats();
+                }
+            }, 'image/jpeg', 0.95);
+        }
+        
+        // 切换摄像头
+        async function switchCamera() {
+            currentCamera = currentCamera === 'user' ? 'environment' : 'user';
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            await startWebCamera();
+        }
+        
+        // 停止摄像头
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            
+            document.getElementById('videoContainer').classList.remove('active');
+            
+            const status = document.getElementById('cameraStatus');
+            status.className = 'camera-status';
+            status.textContent = '⏹ 摄像头已停止';
+        }
+        
+        // 显示照片
+        function displayPhotos() {
+            const previewSection = document.getElementById('previewSection');
+            const previewGrid = document.getElementById('previewGrid');
+            
+            if (photos.length === 0) {
+                previewSection.classList.add('hidden');
+                return;
+            }
+            
+            previewSection.classList.remove('hidden');
+            
+            previewGrid.innerHTML = photos.map(photo => `
+                <div class="preview-item">
+                    <img src="${photo.dataUrl}" alt="${photo.fileName}" onload="adjustImageDisplay(this)">
+                    <div class="file-info">
+                        <h4 style="margin: 0; flex: 1;">${photo.fileName}</h4>
+                        <span class="source-badge source-${photo.source}">
+                            ${photo.source === 'webcam' ? '📹 摄像头' : photo.source === 'upload' ? '📁 本地上传' : '📱 移动端'}
+                        </span>
+                    </div>
+                    <p style="margin-bottom: 5px;">文件大小: ${photo.fileSize}</p>
+                    <p style="font-size: 0.8rem; color: #999;">上传时间: ${photo.timestamp}</p>
+                    <button class="btn btn-primary" onclick="analyzePhoto('${photo.id}')" style="margin-top: 10px;">AI分析</button>
+                </div>
+            `).reverse().join('');
+        }
+        
+        // 调整图片显示
+        function adjustImageDisplay(img) {
+            // 确保图片完整显示并保持原始比例
+            img.style.display = 'block';
+            img.style.maxWidth = '100%';
+            img.style.maxHeight = '400px';
+            img.style.width = 'auto';
+            img.style.height = 'auto';
+            img.style.margin = '0 auto';
+        }
+        
+        // 分析照片
+        function analyzePhoto(photoId) {
+            const photo = photos.find(p => p.id == photoId);
+            if (photo) {
+                const sourceText = photo.source === 'webcam' ? '摄像头拍摄' : 
+                                 photo.source === 'upload' ? '本地上传' : '移动端上传';
+                
+                alert(`🎨 AI分析报告\n\n文件名：${photo.fileName}\n来源：${sourceText}\n大小：${photo.fileSize}\n时间：${photo.timestamp}\n\n分析结果：这是一幅高质量的艺术作品，展现了独特的艺术风格和深厚的文化内涵。通过先进的AI算法分析，我们识别出这幅作品具有重要的艺术价值和历史意义，值得深入研究和欣赏。\n\n• 艺术风格：多样化表现形式\n• 技法特点：精湛的艺术技巧\n• 色彩运用：和谐的色彩搭配\n• 构图分析：平衡的画面结构\n• 历史价值：重要的艺术地位\n• 文化意义：深厚的人文内涵`);
+            }
+        }
+        
+        // 页面加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📁 ArtEcho 完整图片显示版加载完成');
+            console.log('✅ 电脑摄像头功能已准备');
+            console.log('✅ 本地图片上传功能已准备');
+            console.log('✅ 移动端上传功能已准备');
+            console.log('✅ 图片完整显示功能已准备');
+        });
+        
+        // 画廊功能相关变量
+        let galleryPhotos = [];
+        let currentEditingId = null;
+        
+        // 标签页切换
+        function switchTab(tabName) {
+            // 更新标签按钮状态
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // 更新内容显示
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            if (tabName === 'upload') {
+                document.querySelector('.main-section').classList.add('active');
+            } else if (tabName === 'gallery') {
+                document.getElementById('galleryTab').classList.add('active');
+                loadGallery();
+            }
+        }
+        
+        // 加载画廊数据
+        function loadGallery() {
+            const savedGallery = localStorage.getItem('artecho_gallery');
+            if (savedGallery) {
+                galleryPhotos = JSON.parse(savedGallery);
+            } else {
+                galleryPhotos = [];
+            }
+            displayGallery();
+            updateGalleryStats();
+        }
+        
+        // 保存画廊数据
+        function saveGallery() {
+            localStorage.setItem('artecho_gallery', JSON.stringify(galleryPhotos));
+        }
+        
+        // 显示画廊
+        function displayGallery() {
+            const galleryGrid = document.getElementById('galleryGrid');
+            const emptyGallery = document.getElementById('emptyGallery');
+            
+            if (galleryPhotos.length === 0) {
+                galleryGrid.style.display = 'none';
+                emptyGallery.style.display = 'block';
+                return;
+            }
+            
+            galleryGrid.style.display = 'grid';
+            emptyGallery.style.display = 'none';
+            
+            galleryGrid.innerHTML = galleryPhotos.map(photo => `
+                <div class="gallery-item">
+                    <img src="${photo.dataUrl}" alt="${photo.title}" onclick="previewPhoto('${photo.id}')">
+                    <div class="gallery-item-info">
+                        <div class="gallery-item-title">${photo.title}</div>
+                        <div class="gallery-item-desc">${photo.description || '暂无描述'}</div>
+                        <div class="gallery-item-date">${photo.date}</div>
+                        <div class="gallery-item-actions">
+                            <button class="btn-small btn-edit" onclick="editPhoto('${photo.id}')">编辑</button>
+                            <button class="btn-small btn-delete" onclick="deletePhoto('${photo.id}')">删除</button>
+                        </div>
+                    </div>
+                </div>
+            `).reverse().join('');
+        }
+        
+        // 更新画廊统计
+        function updateGalleryStats() {
+            document.getElementById('totalPhotos').textContent = galleryPhotos.length;
+            
+            // 计算今日新增
+            const today = new Date().toDateString();
+            const todayPhotos = galleryPhotos.filter(photo => 
+                new Date(photo.date).toDateString() === today
+            );
+            document.getElementById('todayPhotos').textContent = todayPhotos.length;
+            
+            // 计算存储大小（估算）
+            let totalSize = 0;
+            galleryPhotos.forEach(photo => {
+                // 简单估算：每个图片大约 100KB
+                totalSize += 100;
+            });
+            document.getElementById('storageSize').textContent = (totalSize / 1024).toFixed(1) + ' MB';
+        }
+        
+        // 添加照片到画廊
+        function addToGallery(photoData) {
+            const galleryPhoto = {
+                id: 'gallery_' + Date.now(),
+                title: photoData.fileName || '未命名图片',
+                description: '',
+                dataUrl: photoData.dataUrl,
+                date: new Date().toLocaleString(),
+                source: photoData.source
+            };
+            
+            galleryPhotos.push(galleryPhoto);
+            saveGallery();
+            
+            // 显示添加成功提示
+            const status = document.getElementById('cameraStatus');
+            status.className = 'camera-status success';
+            status.textContent = `✅ 图片已添加到画廊："${galleryPhoto.title}"`;
+            
+            // 如果当前在画廊标签页，刷新显示
+            if (document.getElementById('galleryTab').classList.contains('active')) {
+                displayGallery();
+                updateGalleryStats();
+            }
+        }
+        
+        // 预览照片
+        function previewPhoto(photoId) {
+            const photo = galleryPhotos.find(p => p.id === photoId);
+            if (photo) {
+                document.getElementById('previewTitle').textContent = photo.title;
+                document.getElementById('previewImage').src = photo.dataUrl;
+                document.getElementById('previewDescription').textContent = 
+                    `描述：${photo.description || '暂无描述'}\n添加时间：${photo.date}\n来源：${getSourceText(photo.source)}`;
+                document.getElementById('previewModal').classList.add('active');
+            }
+        }
+        
+        // 关闭预览模态框
+        function closePreviewModal() {
+            document.getElementById('previewModal').classList.remove('active');
+        }
+        
+        // 编辑照片
+        function editPhoto(photoId) {
+            const photo = galleryPhotos.find(p => p.id === photoId);
+            if (photo) {
+                currentEditingId = photoId;
+                document.getElementById('editTitle').value = photo.title;
+                document.getElementById('editDescription').value = photo.description || '';
+                document.getElementById('editModal').classList.add('active');
+            }
+        }
+        
+        // 关闭编辑模态框
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+            currentEditingId = null;
+        }
+        
+        // 删除照片
+        function deletePhoto(photoId) {
+            if (confirm('确定要删除这张图片吗？此操作不可恢复。')) {
+                galleryPhotos = galleryPhotos.filter(p => p.id !== photoId);
+                saveGallery();
+                displayGallery();
+                updateGalleryStats();
+            }
+        }
+        
+        // 清空画廊
+        function clearGallery() {
+            if (confirm('确定要清空整个画廊吗？此操作将删除所有图片，不可恢复。')) {
+                galleryPhotos = [];
+                saveGallery();
+                displayGallery();
+                updateGalleryStats();
+            }
+        }
+        
+        // 导出画廊
+        function exportGallery() {
+            if (galleryPhotos.length === 0) {
+                alert('画廊是空的，没有可导出的内容。');
+                return;
+            }
+            
+            // 创建导出数据
+            const exportData = {
+                exportTime: new Date().toLocaleString(),
+                totalPhotos: galleryPhotos.length,
+                photos: galleryPhotos.map(photo => ({
+                    title: photo.title,
+                    description: photo.description,
+                    date: photo.date,
+                    source: photo.source
+                }))
+            };
+            
+            // 创建下载链接
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `artecho_gallery_${new Date().getTime()}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+        
+        // 获取来源文本
+        function getSourceText(source) {
+            const sourceMap = {
+                'webcam': '摄像头拍摄',
+                'upload': '本地上传',
+                'mobile': '移动端上传'
+            };
+            return sourceMap[source] || '未知来源';
+        }
+        
+        // 处理编辑表单提交
+        document.getElementById('editForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (currentEditingId) {
+                const photo = galleryPhotos.find(p => p.id === currentEditingId);
+                if (photo) {
+                    photo.title = document.getElementById('editTitle').value;
+                    photo.description = document.getElementById('editDescription').value;
+                    saveGallery();
+                    displayGallery();
+                    closeEditModal();
+                }
+            }
+        });
+        
+        // 修改原有的处理文件函数，添加到画廊功能
+        const originalProcessFile = processFile;
+        processFile = function(file, source, index) {
+            originalProcessFile(file, source, index).then(() => {
+                // 在原有的处理完成后，询问用户是否添加到画廊
+                const lastPhoto = photos[photos.length - 1];
+                if (lastPhoto) {
+                    setTimeout(() => {
+                        if (confirm(`图片 "${lastPhoto.fileName}" 处理完成！\n\n是否要添加到我的画廊中进行管理？`)) {
+                            addToGallery(lastPhoto);
+                        }
+                    }, 3000);
+                }
+            });
+        };
+        
+        // 画廊高级功能变量
+        let currentView = 'grid';
+        let currentFilter = 'all';
+        let searchQuery = '';
+        let selectedPhotos = new Set();
+        
+        // 搜索功能
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            searchQuery = e.target.value.toLowerCase();
+            displayGallery();
+        });
+        
+        // 筛选功能
+        function filterPhotos(filter) {
+            currentFilter = filter;
+            
+            // 更新筛选按钮状态
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            displayGallery();
+        }
+        
+        // 切换视图
+        function changeView(view) {
+            currentView = view;
+            
+            // 更新视图按钮状态
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            const galleryGrid = document.getElementById('galleryGrid');
+            if (view === 'list') {
+                galleryGrid.classList.add('list-view');
+            } else {
+                galleryGrid.classList.remove('list-view');
+            }
+            
+            displayGallery();
+        }
+        
+        // 获取筛选后的照片
+        function getFilteredPhotos() {
+            let filtered = galleryPhotos;
+            
+            // 应用来源筛选
+            if (currentFilter !== 'all') {
+                filtered = filtered.filter(photo => photo.source === currentFilter);
+            }
+            
+            // 应用搜索筛选
+            if (searchQuery) {
+                filtered = filtered.filter(photo => 
+                    photo.title.toLowerCase().includes(searchQuery) ||
+                    (photo.description && photo.description.toLowerCase().includes(searchQuery))
+                );
+            }
+            
+            return filtered;
+        }
+        
+        // 拖拽上传功能
+        const uploadZone = document.getElementById('uploadZone');
+        const galleryFileInput = document.getElementById('galleryFileInput');
+        
+        // 防止默认拖拽行为
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadZone.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        // 拖拽高亮效果
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadZone.addEventListener(eventName, () => {
+                uploadZone.classList.add('dragover');
+            }, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadZone.addEventListener(eventName, () => {
+                uploadZone.classList.remove('dragover');
+            }, false);
+        });
+        
+        // 处理拖拽文件
+        uploadZone.addEventListener('drop', handleDrop, false);
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+        
+        // 处理选择的文件
+        galleryFileInput.addEventListener('change', function(e) {
+            handleFiles(e.target.files);
+        });
+        
+        function handleFiles(files) {
+            ([...files]).forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const photoData = {
+                            id: 'gallery_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                            title: file.name.replace(/\.[^/.]+$/, ""), // 移除文件扩展名
+                            description: '',
+                            dataUrl: e.target.result,
+                            date: new Date().toLocaleString(),
+                            source: 'upload',
+                            fileSize: (file.size / 1024).toFixed(2) + ' KB'
+                        };
+                        
+                        galleryPhotos.push(photoData);
+                        saveGallery();
+                        displayGallery();
+                        updateGalleryStats();
+                        
+                        showToast('success', `图片 "${photoData.title}" 已添加到画廊`);
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    showToast('error', `文件 "${file.name}" 不是有效的图片格式`);
+                }
+            });
+        }
+        
+        // 选择/取消选择图片
+        function togglePhotoSelection(photoId) {
+            if (selectedPhotos.has(photoId)) {
+                selectedPhotos.delete(photoId);
+            } else {
+                selectedPhotos.add(photoId);
+            }
+            updateBatchActions();
+            displayGallery();
+        }
+        
+        // 更新批量操作栏
+        function updateBatchActions() {
+            const batchActions = document.getElementById('batchActions');
+            const selectedCount = document.getElementById('selectedCount');
+            
+            if (selectedPhotos.size > 0) {
+                batchActions.classList.add('active');
+                selectedCount.textContent = selectedPhotos.size;
+            } else {
+                batchActions.classList.remove('active');
+            }
+        }
+        
+        // 全选
+        function selectAll() {
+            const filtered = getFilteredPhotos();
+            filtered.forEach(photo => selectedPhotos.add(photo.id));
+            updateBatchActions();
+            displayGallery();
+        }
+        
+        // 取消全选
+        function deselectAll() {
+            selectedPhotos.clear();
+            updateBatchActions();
+            displayGallery();
+        }
+        
+        // 批量编辑
+        function batchEdit() {
+            if (selectedPhotos.size === 0) return;
+            
+            const newTitle = prompt('批量编辑：请输入新的图片标题（留空则不修改）:');
+            if (newTitle === null) return;
+            
+            const newDescription = prompt('批量编辑：请输入新的图片描述（留空则不修改）:');
+            if (newDescription === null) return;
+            
+            selectedPhotos.forEach(photoId => {
+                const photo = galleryPhotos.find(p => p.id === photoId);
+                if (photo) {
+                    if (newTitle.trim()) photo.title = newTitle.trim();
+                    if (newDescription.trim()) photo.description = newDescription.trim();
+                }
+            });
+            
+            saveGallery();
+            displayGallery();
+            showToast('success', `已批量编辑 ${selectedPhotos.size} 张图片`);
+        }
+        
+        // 批量删除
+        function batchDelete() {
+            if (selectedPhotos.size === 0) return;
+            
+            if (confirm(`确定要删除选中的 ${selectedPhotos.size} 张图片吗？此操作不可恢复。`)) {
+                galleryPhotos = galleryPhotos.filter(photo => !selectedPhotos.has(photo.id));
+                selectedPhotos.clear();
+                saveGallery();
+                displayGallery();
+                updateGalleryStats();
+                updateBatchActions();
+                showToast('success', '已批量删除图片');
+            }
+        }
+        
+        // Toast 提示功能
+        function showToast(type, message) {
+            // 移除现有的 toast
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) {
+                existingToast.remove();
+            }
+            
+            const toast = document.createElement('div');
+            toast.className = `toast ${type} show`;
+            
+            const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : '⚠️';
+            toast.innerHTML = `
+                <span class="toast-icon">${icon}</span>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // 3秒后自动移除
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+        
+        // 更新显示画廊函数
+        const originalDisplayGallery = displayGallery;
+        displayGallery = function() {
+            const galleryGrid = document.getElementById('galleryGrid');
+            const emptyGallery = document.getElementById('emptyGallery');
+            const filtered = getFilteredPhotos();
+            
+            if (filtered.length === 0) {
+                galleryGrid.style.display = 'none';
+                emptyGallery.style.display = 'block';
+                return;
+            }
+            
+            galleryGrid.style.display = 'grid';
+            emptyGallery.style.display = 'none';
+            
+            galleryGrid.innerHTML = filtered.map(photo => `
+                <div class="gallery-item ${selectedPhotos.has(photo.id) ? 'selected' : ''}" 
+                     onclick="event.stopPropagation(); togglePhotoSelection('${photo.id}')">
+                    <div class="gallery-checkbox ${selectedPhotos.has(photo.id) ? 'checked' : ''}"></div>
+                    <img src="${photo.dataUrl}" alt="${photo.title}" onclick="event.stopPropagation(); previewPhoto('${photo.id}')">
+                    <div class="gallery-item-info">
+                        <div class="gallery-item-title">${photo.title}</div>
+                        <div class="gallery-item-desc">${photo.description || '暂无描述'}</div>
+                        <div class="gallery-item-meta">
+                            <span class="gallery-item-date">${photo.date}</span>
+                            <span class="gallery-item-source">${getSourceText(photo.source)}</span>
+                        </div>
+                        <div class="gallery-item-tags">
+                            <span class="gallery-tag">${getSourceText(photo.source)}</span>
+                            ${photo.fileSize ? `<span class="gallery-tag">${photo.fileSize}</span>` : ''}
+                        </div>
+                        <div class="gallery-item-actions">
+                            <button class="btn-small btn-edit" onclick="event.stopPropagation(); editPhoto('${photo.id}')">编辑</button>
+                            <button class="btn-small btn-delete" onclick="event.stopPropagation(); deletePhoto('${photo.id}')">删除</button>
+                        </div>
+                    </div>
+                </div>
+            `).reverse().join('');
+        };
+        
+        // 修改原有的删除照片函数
+        const originalDeletePhoto = deletePhoto;
+        deletePhoto = function(photoId) {
+            if (selectedPhotos.has(photoId)) {
+                selectedPhotos.delete(photoId);
+                updateBatchActions();
+            }
+            originalDeletePhoto(photoId);
+            showToast('success', '图片已删除');
+        };
+        
+        // 修改编辑照片函数
+        const originalEditPhoto = editPhoto;
+        editPhoto = function(photoId) {
+            originalEditPhoto(photoId);
+        };
+        
+        // 修改编辑表单提交
+        document.getElementById('editForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (currentEditingId) {
+                const photo = galleryPhotos.find(p => p.id === currentEditingId);
+                if (photo) {
+                    photo.title = document.getElementById('editTitle').value;
+                    photo.description = document.getElementById('editDescription').value;
+                    saveGallery();
+                    displayGallery();
+                    closeEditModal();
+                    showToast('success', '图片信息已更新');
+                }
+            }
+        });
+        
+        // 修改清空画廊函数
+        const originalClearGallery = clearGallery;
+        clearGallery = function() {
+            if (confirm('确定要清空整个画廊吗？此操作将删除所有图片，不可恢复。')) {
+                galleryPhotos = [];
+                selectedPhotos.clear();
+                saveGallery();
+                displayGallery();
+                updateGalleryStats();
+                updateBatchActions();
+                showToast('success', '画廊已清空');
+            }
+        };
+        
+        // 页面加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📁 ArtEcho 完整图片显示版加载完成');
+            console.log('✅ 电脑摄像头功能已准备');
+            console.log('✅ 本地图片上传功能已准备');
+            console.log('✅ 移动端上传功能已准备');
+            console.log('✅ 图片完整显示功能已准备');
+            console.log('✅ 画廊管理功能已准备');
+            console.log('✅ 高级搜索筛选功能已准备');
+            console.log('✅ 批量操作功能已准备');
+            console.log('✅ 拖拽上传功能已准备');
+            
+            // 初始化画廊
+            loadGallery();
+        });
+        
+        // 页面卸载时清理资源
+        window.addEventListener('beforeunload', function() {
+            stopCamera();
+        });
+    </script>
+</body>
+</html>
